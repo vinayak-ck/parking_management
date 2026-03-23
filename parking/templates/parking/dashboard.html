@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parking Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Hide scrollbar for cleaner sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div id="app-root">
+        <!-- Login Screen -->
+        <div id="login-screen">
+            <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+                <div class="w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Parking Management</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Admin Login</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Welcome Back</h3>
+                        </div>
+                        <div class="p-4 sm:p-6">
+                            <form id="login-form" class="space-y-6">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                                    <input id="username" type="text" value="admin" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400" placeholder="admin" />
+                                </div>
+                                <div>
+                                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                    <input id="password" type="password" value="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400" placeholder="password" />
+                                </div>
+                                <div>
+                                    <button type="submit" id="login-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Sign In
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen (hidden by default) -->
+        <div id="dashboard-screen" class="hidden">
+            <div class="flex h-screen overflow-hidden">
+                <!-- Mobile Sidebar Backdrop -->
+                <div id="sidebar-backdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 md:hidden hidden"></div>
+                
+                <!-- Sidebar -->
+                <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40 flex-shrink-0 flex flex-col sidebar-transition transform -translate-x-full md:translate-x-0">
+                    <div class="flex items-center space-x-3 mb-6 p-4">
+                        <div class="rounded-lg bg-indigo-600 text-white w-10 h-10 flex items-center justify-center flex-shrink-0">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm0 2c2.21 0 4 1.79 4 4v1H8v-1c0-2.21 1.79-4 4-4z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-2a4 4 0 014-4h10a4 4 0 014 4v2" /></svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold text-gray-800 dark:text-white">Parking System</h1>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Admin Dashboard</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation (Takes up remaining space) -->
+                    <nav id="sidebar-nav" class="flex-1 space-y-1 px-2 overflow-y-auto no-scrollbar">
+                        <!-- Nav items injected via JS -->
+                    </nav>
+
+                    <!-- Logout Button (Pushed to bottom) -->
+                    <div class="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                        <button data-action="logout" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="flex-1 flex flex-col h-full overflow-hidden bg-gray-100 dark:bg-gray-900">
+                    <header class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-10 shadow-sm">
+                        <div class="flex items-center">
+                            <button id="sidebar-toggle" class="text-gray-500 dark:text-gray-400 mr-4 md:hidden" aria-label="Open sidebar">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            </button>
+                            <h2 id="header-title" class="text-2xl font-bold text-gray-900 dark:text-white"></h2>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <!-- Theme Toggle Button -->
+                            <button id="theme-toggle" class="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- Sun Icon (shown in dark mode) -->
+                                <svg id="theme-toggle-sun" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                <!-- Moon Icon (shown in light mode) -->
+                                <svg id="theme-toggle-moon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 24.042l1.354-1.354a9 9 0 11-12.728-12.728L9.69 11.332a9 9 0 0010.664 12.71z"></path></svg>
+                            </button>
+
+                            <button id="refresh-button" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm transition-colors shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" /></svg>
+                                <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                        </div>
+                    </header>
+                    <div id="view-content" class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+                        <!-- Dynamic content will be injected here -->
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed bottom-4 right-4 z-50 w-full max-w-sm"></div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- ENUMS ---
+    const VehicleType = { CAR: 'car', BIKE: 'bike', OTHER: 'other' };
+    const PassType = { DAILY: 'daily', WEEKLY: 'weekly', MONTHLY: 'monthly', YEARLY: 'yearly' };
+
+    // --- REAL DJANGO API ---
+    const getCookie = (name) => {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const apiCall = async (url, method = 'GET', body = null) => {
+        const headers = { 'Content-Type': 'application/json' };
+        if (method === 'POST') {
+            headers['X-CSRFToken'] = getCookie('csrftoken');
+        }
+        const config = { method, headers };
+        if (body) config.body = JSON.stringify(body);
+        
+        const response = await fetch(url, config);
+        // Handle non-JSON responses (like 500 errors) gracefully
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            return await response.json();
+        } else {
+             throw new Error("Server error");
+        }
+    };
+
+    const api = {
+        postLogin: (username, password) => apiCall('/api/login/', 'POST', { username, password }),
+        getDashboardStats: () => apiCall('/api/dashboard_stats/'),
+        getRecentTransactions: () => apiCall('/api/recent_transactions/'),
+        getAllTransactions: () => apiCall('/api/all_transactions/'),
+        getExpiryNotifications: () => apiCall('/api/expiry_notifications/'),
+        getSlotsData: () => apiCall('/api/slots_data/'),
+        postCreatePass: (details) => apiCall('/api/create_pass/', 'POST', details),
+        postVehicleEntry: (vehicle_number, vehicle_type) => apiCall('/api/vehicle_entry/', 'POST', { vehicle_number, vehicle_type }),
+        postVehicleExit: (vehicle_number) => apiCall('/api/vehicle_exit/', 'POST', { vehicle_number }),
+        getAllPasses: () => apiCall('/api/all_passes/'),
+    };
+
+    // --- STATE MANAGEMENT ---
+    const appState = {
+        isAuthenticated: sessionStorage.getItem('isAuthenticated') === 'true',
+        currentView: 'overview',
+        isSidebarOpen: false,
+    };
+
+    // --- DARK MODE LOGIC ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('theme-toggle-sun');
+    const moonIcon = document.getElementById('theme-toggle-moon');
+    const htmlEl = document.documentElement;
+
+    // Check localStorage or system preference
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        htmlEl.classList.add('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    } else {
+        htmlEl.classList.remove('dark');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        if (htmlEl.classList.contains('dark')) {
+            htmlEl.classList.remove('dark');
+            localStorage.theme = 'light';
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            htmlEl.classList.add('dark');
+            localStorage.theme = 'dark';
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+    });
+
+    // --- DOM ELEMENTS ---
+    const loginScreen = document.getElementById('login-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
+    const viewContent = document.getElementById('view-content');
+    const headerTitle = document.getElementById('header-title');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    // --- TEMPLATING & UTILS ---
+    const showToast = (message, type = 'info') => {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        const typeClasses = {
+            success: 'bg-green-500',
+            error: 'bg-red-500',
+            info: 'bg-blue-500',
+        };
+        toast.className = `w-full mb-2 p-4 rounded-md shadow-lg text-white transition-all duration-300 transform translate-y-5 opacity-0 ${typeClasses[type]}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => { toast.classList.remove('translate-y-5', 'opacity-0'); toast.classList.add('translate-y-0', 'opacity-100'); }, 10);
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100'); toast.classList.add('translate-y-5', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    };
+    
+    const formatDate = (iso) => iso ? new Date(iso).toLocaleString() : '—';
+    const formatDateShort = (iso) => iso ? new Date(iso).toLocaleDateString() : '—';
+    const renderLoading = () => viewContent.innerHTML = `<div class="flex justify-center items-center h-64"><div class="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>`;
+    const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    // --- VIEWS CONFIG ---
+    const views = {
+        overview: { title: 'Dashboard Overview', render: renderOverviewView },
+        'entry-exit': { title: 'Vehicle Entry & Exit', render: renderEntryExitView },
+        'create-pass': { title: 'Create New Parking Pass', render: renderCreatePassView },
+        'manage-passes': { title: 'Active & Expired Passes', render: renderManagePassesView },
+        'pass-history': { title: 'Pass Transaction History', render: renderPassHistoryView },
+        slots: { title: 'Available Parking Slots', render: renderAvailableSlotsView },
+        transactions: { title: 'Transaction History', render: renderTransactionsView },
+        expiry: { title: 'Pass Expiry Notifications', render: renderExpiryAlertsView },
+    };
+
+    const navItems = [
+        { view: 'overview', label: 'Overview' },
+        { view: 'entry-exit', label: 'Entry / Exit' },
+        { view: 'create-pass', label: 'Create Pass' },
+        { view: 'manage-passes', label: 'Manage Passes' },
+        { view: 'pass-history', label: 'Pass History' },
+        { view: 'slots', label: 'Available Slots' },
+        { view: 'transactions', label: 'Transactions' },
+        { view: 'expiry', label: 'Expiry Alerts' },
+    ];
+    
+    // --- RENDER FUNCTIONS (With Dark Mode Classes) ---
+
+    async function renderOverviewView() {
+        renderLoading();
+        try {
+            const [stats, recentTxs, expiring] = await Promise.all([
+                api.getDashboardStats(),
+                api.getRecentTransactions(),
+                api.getExpiryNotifications()
+            ]);
+            
+            viewContent.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6"><h3 class="text-gray-500 dark:text-gray-400">Active Passes</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">${stats.active_passes_count}</p></div>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6"><h3 class="text-gray-500 dark:text-gray-400">Vehicles Today</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">${stats.vehicles_today}</p></div>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6"><h3 class="text-gray-500 dark:text-gray-400">Earnings Today</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">₹${typeof stats.earnings_today === 'number' ? stats.earnings_today.toFixed(2) : stats.earnings_today}</p></div>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6"><h3 class="text-gray-500 dark:text-gray-400">Slots Filled</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">${stats.slots_filled}</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                            <div class="p-6 border-b dark:border-gray-700"><h4 class="font-semibold text-gray-900 dark:text-white">Recent Transactions</h4></div>
+                            <div class="p-6 space-y-4 max-h-96 overflow-y-auto">
+                                ${recentTxs.length > 0 ? recentTxs.map(tx => `
+                                    <div class="flex items-center justify-between text-sm py-2 border-b dark:border-gray-700 last:border-b-0">
+                                        <div><p class="font-semibold text-gray-900 dark:text-white">${tx.vehicle.vehicle_number}</p><p class="text-gray-500 dark:text-gray-400">${formatDate(tx.entry_time)}</p></div>
+                                        <span class="px-2 py-1 rounded-full text-xs ${tx.exit_time ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">${tx.exit_time ? 'Exited' : 'Parked'}</span>
+                                    </div>
+                                `).join('') : '<p class="text-gray-500 dark:text-gray-400">No recent transactions.</p>'}
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                            <div class="p-6 border-b dark:border-gray-700"><h4 class="font-semibold text-gray-900 dark:text-white">Upcoming Pass Expiries</h4></div>
+                            <div class="p-6 space-y-4 max-h-96 overflow-y-auto">
+                                ${expiring.length > 0 ? expiring.map(p => `
+                                    <div class="flex items-center justify-between text-sm py-2 border-b dark:border-gray-700 last:border-b-0">
+                                        <div><p class="font-semibold text-gray-900 dark:text-white">${p.vehicle_number}</p><p class="text-gray-500 dark:text-gray-400">Expires: ${formatDateShort(p.pass.expiry_date)}</p></div>
+                                        <span class="font-medium text-orange-600 dark:text-orange-400">${p.days_left} day${p.days_left !== 1 ? 's' : ''}</span>
+                                    </div>
+                                `).join('') : '<p class="text-gray-500 dark:text-gray-400">No passes expiring soon.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (e) {
+            viewContent.innerHTML = `<p class="text-red-500">Error loading dashboard data.</p>`;
+        }
+    }
+
+    function renderEntryExitView() {
+        viewContent.innerHTML = `
+            <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="p-6 border-b dark:border-gray-700"><h3 class="text-lg font-semibold text-gray-900 dark:text-white">Log Vehicle Movement</h3></div>
+                <form id="entry-exit-form" class="p-6 space-y-4">
+                    <div>
+                        <label for="ee-vehicle-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Number</label>
+                        <input id="ee-vehicle-number" type="text" placeholder="e.g., KA-01-AB-1234" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm uppercase placeholder-gray-400" required />
+                    </div>
+                    <div>
+                        <label for="ee-vehicle-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Type <span class="text-gray-500 dark:text-gray-400">(for new entries)</span></label>
+                        <select id="ee-vehicle-type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm capitalize">
+                            ${Object.values(VehicleType).map(v => `<option value="${v}">${capitalize(v)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="flex gap-4 pt-2">
+                        <button type="button" data-action="entry" class="flex-1 py-2 px-4 rounded-md text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50">Record Entry</button>
+                        <button type="button" data-action="exit" class="flex-1 py-2 px-4 rounded-md text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 disabled:opacity-50">Record Exit</button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    function renderCreatePassView() {
+        viewContent.innerHTML = `
+            <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 relative">
+              <div class="p-6 border-b dark:border-gray-700"><h3 class="text-lg font-semibold text-gray-900 dark:text-white">New Pass Details</h3></div>
+              <form id="create-pass-form" class="p-6 space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner Name</label>
+                  <input name="owner_name" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm placeholder-gray-400" required />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vehicle Number</label>
+                  <input name="vehicle_number" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm uppercase placeholder-gray-400" required />
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vehicle Type</label>
+                    <select name="vehicle_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm capitalize">
+                      ${Object.values(VehicleType).map(v => `<option value="${v}">${capitalize(v)}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pass Type</label>
+                    <select name="pass_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm capitalize">
+                      ${Object.values(PassType).map(p => `<option value="${p}">${capitalize(p)}</option>`).join('')}
+                    </select>
+                  </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                  <button type="reset" class="py-2 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Clear</button>
+                  <button type="submit" class="py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 text-sm">Proceed to Pay</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- PAYMENT MODAL -->
+            <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900 bg-opacity-60 backdrop-blur-sm">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm mx-4 overflow-hidden transform transition-all">
+                    <div class="bg-indigo-600 p-4 text-white text-center">
+                        <h3 class="text-lg font-bold">Confirm Payment</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="text-center">
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">Total Amount Due</p>
+                            <p id="modal-amount" class="text-4xl font-bold text-gray-900 dark:text-white mt-1">₹0.00</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" data-method="cash" class="pay-method-btn py-2 px-1 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-md text-sm font-medium text-center">Cash</button>
+                                <button type="button" data-method="card" class="pay-method-btn py-2 px-1 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium text-center hover:bg-gray-50 dark:hover:bg-gray-700">Card</button>
+                                <button type="button" data-method="upi" class="pay-method-btn py-2 px-1 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium text-center hover:bg-gray-50 dark:hover:bg-gray-700">UPI</button>
+                            </div>
+                        </div>
+
+                        <!-- UPI QR SECTION (Hidden initially) -->
+                        <div id="upi-qr-section" class="hidden flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <p class="text-xs text-gray-500 dark:text-gray-300 mb-2">Scan with any UPI App</p>
+                            <img id="upi-qr-image" src="" alt="UPI QR" class="w-32 h-32 border-2 border-white rounded-md" />
+                            <div id="verify-spinner" class="hidden mt-2 text-indigo-600 text-xs font-semibold animate-pulse">Verifying Payment...</div>
+                            <button id="btn-verify-upi" class="mt-3 w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded shadow-sm">I have Paid</button>
+                        </div>
+
+                        <div class="flex gap-3 mt-6">
+                            <button id="cancel-payment" class="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                            <button id="confirm-payment" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 shadow-md">Pay & Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    async function renderPassesTableView(containerId, passes) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      if (passes.length === 0) {
+        container.innerHTML = `<p class="text-center py-10 text-gray-500 dark:text-gray-400">No passes found.</p>`;
+        return;
+      }
+      container.innerHTML = `
+        <div class="overflow-x-auto rounded-lg border dark:border-gray-700">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Vehicle No</th>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Owner</th>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Pass Type</th>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Price</th>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Issue Date</th>
+                        <th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    ${passes.map(p => `
+                        <tr>
+                            <td class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">${p.vehicle.vehicle_number}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${p.vehicle.owner.name}</td>
+                            <td class="px-6 py-4 capitalize whitespace-nowrap text-gray-500 dark:text-gray-400">${p.pass_type}</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900 dark:text-white">₹${p.price}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDateShort(p.issue_date)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDateShort(p.expiry_date)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>`;
+    }
+
+    async function renderManagePassesView() {
+        viewContent.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs" id="manage-passes-tabs">
+                        <button data-tab="active" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 dark:text-indigo-400">Active</button>
+                        <button data-tab="expired" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200">Expired</button>
+                    </nav>
+                </div>
+                <div id="manage-passes-content" class="p-0 sm:p-2"></div>
+            </div>
+        `;
+        renderLoadingForTab('manage-passes-content');
+        const allPasses = await api.getAllPasses();
+        const now = new Date();
+        const passesData = {
+            active: allPasses.filter(p => new Date(p.expiry_date) > now),
+            expired: allPasses.filter(p => new Date(p.expiry_date) <= now),
+        };
+        document.querySelector('[data-tab="active"]').textContent = `Active (${passesData.active.length})`;
+        document.querySelector('[data-tab="expired"]').textContent = `Expired (${passesData.expired.length})`;
+        
+        renderPassesTableView('manage-passes-content', passesData.active);
+        
+        viewContent.querySelector('#manage-passes-tabs').addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON') {
+                const tab = e.target.dataset.tab;
+                document.querySelectorAll('#manage-passes-tabs button').forEach(btn => {
+                    btn.className = `whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200`;
+                });
+                e.target.className = `whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 dark:text-indigo-400`;
+                renderPassesTableView('manage-passes-content', passesData[tab]);
+            }
+        });
+    }
+
+    async function renderPassHistoryView() {
+        const tabs = ['all', ...Object.values(PassType)];
+        viewContent.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav id="pass-history-tabs" class="-mb-px flex space-x-6 px-6 overflow-x-auto no-scrollbar" aria-label="Tabs">
+                        ${tabs.map(tab => `
+                            <button data-tab="${tab}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize ${tab === 'all' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'}">
+                                ${tab}
+                            </button>
+                        `).join('')}
+                    </nav>
+                </div>
+                <div id="pass-history-content" class="p-0 sm:p-2"></div>
+            </div>`;
+        
+        renderLoadingForTab('pass-history-content');
+        const allPasses = await api.getAllPasses();
+
+        const renderFilteredPasses = (filter) => {
+            const filtered = filter === 'all' ? allPasses : allPasses.filter(p => p.pass_type === filter);
+            renderPassesTableView('pass-history-content', filtered);
+        };
+
+        renderFilteredPasses('all');
+        
+        viewContent.querySelector('#pass-history-tabs').addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON') {
+                const tab = e.target.dataset.tab;
+                document.querySelectorAll('#pass-history-tabs button').forEach(btn => {
+                    btn.className = btn.className.replace('border-indigo-500 text-indigo-600 dark:text-indigo-400', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200');
+                });
+                e.target.className = e.target.className.replace('border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200', 'border-indigo-500 text-indigo-600 dark:text-indigo-400');
+                renderFilteredPasses(tab);
+            }
+        });
+    }
+
+    async function renderAvailableSlotsView() {
+        renderLoading();
+        const slotsData = await api.getSlotsData();
+        const renderBar = (type, occupied, total) => {
+            const pct = total > 0 ? (occupied / total) * 100 : 0;
+            const color = pct > 85 ? 'bg-red-500' : pct > 60 ? 'bg-yellow-500' : 'bg-green-500';
+            return `
+                <div class="space-y-2">
+                    <div class="flex justify-between items-baseline"><h3 class="text-lg font-semibold capitalize text-gray-900 dark:text-white">${type}s</h3><p class="text-sm text-gray-600 dark:text-gray-300"><span class="font-bold text-lg">${total - occupied}</span> free</p></div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="${color} h-2.5 rounded-full" style="width: ${pct}%"></div></div>
+                    <p class="text-right text-sm text-gray-500 dark:text-gray-400">${occupied} / ${total} occupied</p>
+                </div>`;
+        };
+        viewContent.innerHTML = `
+            <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="p-6 border-b dark:border-gray-700"><h3 class="text-lg font-semibold text-gray-900 dark:text-white">Parking Slot Occupancy</h3></div>
+                <div class="p-6 space-y-6">
+                    ${renderBar('car', slotsData.cars_occupied, slotsData.total_car_slots)}
+                    ${renderBar('bike', slotsData.bikes_occupied, slotsData.total_bike_slots)}
+                </div>
+            </div>`;
+    }
+
+    async function renderTransactionsView() {
+        renderLoading();
+        const transactions = await api.getAllTransactions();
+        viewContent.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                ${['Vehicle No', 'Owner', 'Type', 'Entry Time', 'Exit Time', 'Fees', 'Status'].map(h => `<th class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">${h}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            ${transactions.length > 0 ? transactions.map(tx => `
+                                <tr>
+                                    <td class="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white">${tx.vehicle.vehicle_number}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${tx.vehicle.owner.name}</td>
+                                    <td class="px-6 py-4 capitalize whitespace-nowrap text-gray-500 dark:text-gray-400">${tx.vehicle.vehicle_type}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDate(tx.entry_time)}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDate(tx.exit_time)}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white font-medium">${tx.fees_paid !== null ? `₹${typeof tx.fees_paid === 'number' ? tx.fees_paid.toFixed(2) : tx.fees_paid}` : '—'}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs font-semibold rounded-full ${tx.exit_time ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">${tx.exit_time ? 'Exited' : 'Parked'}</span>
+                                    </td>
+                                </tr>
+                            `).join('') : `<tr><td colSpan="7" class="text-center py-10 text-gray-500 dark:text-gray-400">No transactions found.</td></tr>`}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+    }
+
+    async function renderExpiryAlertsView() {
+        renderLoading();
+        const expiring = await api.getExpiryNotifications();
+        viewContent.innerHTML = `
+            <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700">
+                <div class="p-6 border-b dark:border-gray-700"><h3 class="text-lg font-semibold text-gray-900 dark:text-white">Passes Expiring Within 7 Days</h3></div>
+                <div class="p-6">
+                    ${expiring.length > 0 ? `
+                        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                            ${expiring.map(p => `
+                                <div class="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">${p.vehicle_number}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">${p.owner_name} - <span class="capitalize">${p.pass.pass_type}</span></p>
+                                    </div>
+                                    <div class="mt-2 sm:mt-0 text-sm sm:text-right">
+                                        <p class="font-medium text-gray-700 dark:text-gray-300">Expires: ${formatDateShort(p.pass.expiry_date)}</p>
+                                        <p class="text-red-600 dark:text-red-400 font-semibold">${p.days_left} ${p.days_left === 1 ? 'day' : 'days'} left</p>
+                                    </div>
+                                </div>`).join('')}
+                        </div>` : `<p class="text-center py-10 text-gray-500 dark:text-gray-400">No passes are expiring soon.</p>`}
+                </div>
+            </div>`;
+    }
+    
+    const renderLoadingForTab = (containerId) => {
+      const container = document.getElementById(containerId);
+      if (container) {
+        container.innerHTML = `<div class="flex justify-center items-center h-64"><div class="w-6 h-6 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>`;
+      }
+    };
+
+    // --- NAVIGATION AND APP LOGIC ---
+    const navigateTo = (view) => {
+        if (!views[view]) return;
+        appState.currentView = view;
+        headerTitle.textContent = views[view].title;
+        views[view].render();
+        updateSidebarNav();
+        if (appState.isSidebarOpen) toggleSidebar();
+    };
+
+    const updateSidebarNav = () => {
+        sidebarNav.innerHTML = navItems.map(item => `
+            <button data-view="${item.view}" class="w-full text-left px-3 py-2.5 rounded-md flex items-center space-x-3 text-sm font-medium transition-colors ${appState.currentView === item.view ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}">
+                ${item.label}
+            </button>
+        `).join('');
+    };
+    
+    const toggleSidebar = () => {
+        appState.isSidebarOpen = !appState.isSidebarOpen;
+        if (appState.isSidebarOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            sidebarBackdrop.classList.remove('hidden');
+        } else {
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+        }
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        const username = e.target.elements.username.value;
+        const password = e.target.elements.password.value;
+        const button = document.getElementById('login-button');
+        button.disabled = true;
+        button.textContent = 'Signing in...';
+
+        try {
+            const res = await api.postLogin(username, password);
+            if (res.status === 'success') {
+                sessionStorage.setItem('isAuthenticated', 'true');
+                appState.isAuthenticated = true;
+                showToast('Login successful!', 'success');
+                renderApp();
+            } else {
+                showToast(res.message, 'error');
+            }
+        } catch (error) {
+            showToast('Login failed. Please check connection.', 'error');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Sign In';
+        }
+    };
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('isAuthenticated');
+        appState.isAuthenticated = false;
+        showToast('You have been logged out.', 'info');
+        renderApp();
+    };
+
+    const renderApp = () => {
+        if (appState.isAuthenticated) {
+            loginScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('hidden');
+            navigateTo(appState.currentView);
+        } else {
+            loginScreen.classList.remove('hidden');
+            dashboardScreen.classList.add('hidden');
+        }
+    };
+    
+    // --- EVENT LISTENERS ---
+    document.getElementById('login-form').addEventListener('submit', handleLogin);
+    
+    document.getElementById('dashboard-screen').addEventListener('click', (e) => {
+        const target = e.target;
+        
+        const navButton = target.closest('[data-view]');
+        if (navButton) {
+            navigateTo(navButton.dataset.view);
+            return;
+        }
+
+        if (target.closest('[data-action="logout"]')) {
+            handleLogout();
+            return;
+        }
+        
+        if (target.closest('#refresh-button')) {
+            showToast('Data refreshed!', 'success');
+            navigateTo(appState.currentView);
+            return;
+        }
+
+        if (target.closest('#sidebar-toggle') || target.closest('#sidebar-backdrop')) {
+            toggleSidebar();
+            return;
+        }
+    });
+    
+    viewContent.addEventListener('click', async (e) => {
+        const target = e.target;
+        
+        const entryExitButton = target.closest('#entry-exit-form button[data-action]');
+        if (entryExitButton) {
+            const action = entryExitButton.dataset.action;
+            const form = document.getElementById('entry-exit-form');
+            const vehicleNumber = form.querySelector('#ee-vehicle-number').value.toUpperCase();
+            const vehicleType = form.querySelector('#ee-vehicle-type').value;
+
+            if (!vehicleNumber) {
+                showToast('Vehicle number is required.', 'error');
+                return;
+            }
+
+            entryExitButton.disabled = true;
+            try {
+                const res = action === 'entry'
+                    ? await api.postVehicleEntry(vehicleNumber, vehicleType)
+                    : await api.postVehicleExit(vehicleNumber);
+                showToast(res.message, res.status);
+                if (res.status === 'success') form.reset();
+            } catch (err) {
+                showToast(err.message || 'An error occurred.', 'error');
+            } finally {
+                entryExitButton.disabled = false;
+            }
+        }
+    });
+
+    viewContent.addEventListener('submit', async (e) => {
+        const target = e.target;
+
+        if (target.id === 'create-pass-form') {
+            e.preventDefault();
+            
+            const formData = new FormData(target);
+            const passDetails = {
+                owner_name: formData.get('owner_name'),
+                vehicle_number: formData.get('vehicle_number').toUpperCase(),
+                vehicle_type: formData.get('vehicle_type'),
+                pass_type: formData.get('pass_type'),
+            };
+
+            const rates = { daily: 10, weekly: 50, monthly: 200, yearly: 2000 };
+            const price = rates[passDetails.pass_type] || 0;
+
+            // DOM Elements
+            const modal = document.getElementById('payment-modal');
+            const amountDisplay = document.getElementById('modal-amount');
+            const confirmBtn = document.getElementById('confirm-payment');
+            const cancelBtn = document.getElementById('cancel-payment');
+            const methodBtns = document.querySelectorAll('.pay-method-btn');
+            const upiSection = document.getElementById('upi-qr-section');
+            const qrImage = document.getElementById('upi-qr-image');
+            const verifyBtn = document.getElementById('btn-verify-upi');
+            const spinner = document.getElementById('verify-spinner');
+            
+            let selectedMethod = 'cash';
+            let isUpiVerified = false;
+
+            amountDisplay.textContent = `₹${price.toFixed(2)}`;
+            modal.classList.remove('hidden');
+            
+            // Reset UI State
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove('hidden');
+            upiSection.classList.add('hidden');
+            confirmBtn.textContent = 'Pay & Create';
+
+            // Method Selection Logic
+            methodBtns.forEach(btn => {
+                btn.onclick = () => {
+                    // Visual Toggle
+                    methodBtns.forEach(b => {
+                        b.className = 'pay-method-btn py-2 px-1 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium text-center hover:bg-gray-50 dark:hover:bg-gray-700';
+                    });
+                    btn.className = 'pay-method-btn py-2 px-1 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-md text-sm font-medium text-center';
+                    
+                    selectedMethod = btn.dataset.method;
+
+                    // Handle UPI Specifics
+                    // Handle UPI Specifics
+                    if (selectedMethod === 'upi') {
+                        // ---------------------------------------------------------
+                        // CONFIGURATION: ENTER YOUR DETAILS HERE
+                        // ---------------------------------------------------------
+                        const myUpiId = "7904608866@ptyes"; // <--- REPLACE THIS with your actual UPI ID
+                        const myName = "Parking Admin";      // <--- REPLACE THIS with your Name/Business Name
+                        // ---------------------------------------------------------
+
+                        // Generate UPI String
+                        const upiString = `upi://pay?pa=${myUpiId}&pn=${encodeURIComponent(myName)}&am=${price}&cu=INR`;
+                        
+                        // Generate QR Code Image using public API
+                        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+                        
+                        upiSection.classList.remove('hidden');
+                        confirmBtn.classList.add('hidden'); 
+                        isUpiVerified = false;
+                        verifyBtn.textContent = "I have Paid";
+                        verifyBtn.disabled = false;
+                        verifyBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'cursor-default');
+                        verifyBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    } else {
+                        // ... existing else logic ...
+                        upiSection.classList.add('hidden');
+                        confirmBtn.classList.remove('hidden');
+                    }
+                };
+            });
+
+            // Handle UPI Verification Simulation
+            verifyBtn.onclick = () => {
+                verifyBtn.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                
+                // Simulate network delay
+                setTimeout(() => {
+                    spinner.classList.add('hidden');
+                    verifyBtn.classList.remove('hidden');
+                    verifyBtn.textContent = "Payment Verified ✓";
+                    verifyBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    verifyBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'cursor-default');
+                    verifyBtn.disabled = true;
+                    
+                    isUpiVerified = true;
+                    confirmBtn.classList.remove('hidden'); // Show Create button
+                }, 2000); 
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('hidden');
+            };
+
+            confirmBtn.onclick = async () => {
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Processing...';
+
+                try {
+                    const res = await api.postCreatePass({ 
+                        ...passDetails, 
+                        payment_method: selectedMethod 
+                    });
+                    
+                    showToast(res.message, res.status);
+                    
+                    if (res.status === 'success') {
+                        target.reset();
+                        modal.classList.add('hidden');
+                    }
+                } catch (err) {
+                    showToast(err.message || 'Error processing request', 'error');
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Pay & Create';
+                }
+            };
+        }
+    });
+
+    // --- INITIALIZE APP ---
+    renderApp();
+});
+</script>
+</body>
+</html>
