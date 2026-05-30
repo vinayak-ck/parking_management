@@ -1,153 +1,90 @@
-🚗 Parking Management System
+# 🅿️ Parking Management System
 
-A full-stack Django-based Parking Management System that helps manage vehicle parking operations efficiently, including vehicle entry, exit tracking, parking allocation, and payment handling.
+A full-stack parking management web application built with Django and Django REST Framework — automating vehicle entry, exit, slot allocation, and payment calculation.
 
-📌 Overview
+> ⚠️ **Note**: This project is not deployed online. Run it locally using the instructions below.
 
-This project is designed to solve real-world parking problems in institutions, malls, and offices by digitizing the parking process. It allows administrators to track vehicles, manage parking slots, and monitor usage in real time.
+---
 
-✨ Features
+## ✨ Features
 
-🚘 Vehicle Entry & Exit Tracking
+- 🚗 Vehicle entry and exit tracking
+- 🔢 Real-time parking slot availability
+- 🧠 Dynamic slot allocation logic
+- ⏱️ Duration-based payment calculation (per hour/minute)
+- 📊 Admin dashboard for monitoring all parking activity
+- 🔌 RESTful API built with Django REST Framework
 
-🅿️ Parking Slot Management
+---
 
-⏱️ Automatic Parking Duration Calculation
+## 🛠️ Tech Stack
 
-💰 Payment Handling (based on duration)
+| Layer | Tech |
+|---|---|
+| Backend | Django, Django REST Framework |
+| Frontend | HTML, CSS, JavaScript |
+| Database | SQLite |
+| API | REST (DRF) |
 
-📊 Admin Dashboard for monitoring
+---
 
-🔄 REST APIs for integration
+## 🚀 Run Locally
 
-🗂️ Database storage using SQLite
+```bash
+# Clone the repo
+git clone https://github.com/vinayak-ck/parking_management.git
+cd parking_management
 
-🛠️ Tech Stack
-
-Layer	Technology Used
-
-Backend	Python, Django
-
-API	Django REST Framework
-
-Database	SQLite
-
-Frontend	HTML, CSS (Django Templates)
-
-📂 Project Structure
-
-parking-_management/
-
-│
-
-├── manage.py
-
-├── db.sqlite3
-
-│
-
-├── parkingsystem/        # Project settings
-
-│   ├── settings.py
-
-│   ├── urls.py
-
-│   └── ...
-
-│
-
-├── parking/              # Main application
-
-│   ├── models.py         # Database schema
-
-│   ├── views.py          # Logic & request handling
-
-│   ├── serializers.py    # API layer
-
-│   ├── urls.py           # Routing
-
-│   ├── templates/        # UI files
-
-│   ├── utils.py          # Helper functions
-
-│   └── migrations/
-
-⚙️ Installation & Setup
-
-1️⃣ Clone Repository
-
-git clone https://github.com/vinayak-ck/parking-_management.git
-
-cd parking-_management
-
-2️⃣ Create Virtual Environment
-
+# Create virtual environment
 python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-venv\Scripts\activate   # Windows
+# Install dependencies
+pip install -r requirements.txt
 
-3️⃣ Install Dependencies
-
-pip install django djangorestframework
-
-4️⃣ Run Migrations
-
+# Apply migrations
 python manage.py migrate
 
-5️⃣ Start Server
+# Create admin user (optional)
+python manage.py createsuperuser
 
+# Run the server
 python manage.py runserver
+```
 
-6️⃣ Open in Browser
+Open `http://127.0.0.1:8000` in your browser.  
+Admin panel: `http://127.0.0.1:8000/admin`
 
-http://127.0.0.1:8000/
+---
 
-📊 System Modules
+## 📡 API Endpoints
 
-🚘 Parking Module
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/entry/` | Register vehicle entry |
+| POST | `/api/exit/` | Register vehicle exit + calculate fee |
+| GET | `/api/slots/` | Get available slot count |
+| GET | `/api/history/` | View parking history |
 
-Handles vehicle check-in and check-out
+---
 
-Stores entry/exit timestamps
+## 📁 Project Structure
 
-🅿️ Slot Management
+```
+parking_management/
+├── manage.py
+├── requirements.txt
+├── parking/
+│   ├── models.py       # Vehicle, Slot, Session models
+│   ├── views.py        # Entry, exit, slot views
+│   ├── serializers.py  # DRF serializers
+│   └── urls.py
+└── templates/
+    └── dashboard.html
+```
 
-Allocates parking slots dynamically
+---
 
-Tracks availability
+## 📬 Contact
 
-💰 Payment Module
-
-Calculates charges based on time
-
-Stores payment details
-
-📡 API Module
-
-Built using serializers
-
-Can be integrated with mobile apps
-
-🎯 Use Cases
-
-College / Campus Parking
-
-Shopping Malls
-
-Office Buildings
-
-Apartment Complexes
-
-🚀 Future Enhancements
-
-🔐 User Authentication System
-
-💳 Online Payment Gateway Integration
-
-📱 Mobile App Integration
-
-📈 Analytics Dashboard (charts & reports)
-
-🤖 AI-based parking prediction
-
-
+Built by [Vinayak Kanavalli](https://github.com/vinayak-ck) — vckanavalli@gmail.com
